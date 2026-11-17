@@ -10,6 +10,7 @@
 #   PROD_HOST   e.g. https://dbc-7a752a54-93ab.cloud.databricks.com
 #   PROD_TOKEN  a Databricks PAT for the prod workspace
 name: Deploy bundle to prod
+# Trigger: any push to main (e.g. from the Databricks Git folder). Builds the full stack.
 
 on:
   push:
