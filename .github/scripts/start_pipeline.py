@@ -29,18 +29,19 @@ if pid is None:
 
 print(f"Starting pipeline {PIPELINE_NAME} (id {pid})...")
 try:
-    update = w.pipelines.start(pipeline_id=pid)
+    update = w.pipelines.start_update(pipeline_id=pid)
     update_id = update.update_id
 except Exception as e:  # already running: fall through and watch the active update
-    print(f"start() said: {e} — continuing by watching the latest update")
+    print(f"start_update() said: {e} — continuing by watching the latest update")
     update_id = None
 
 print("Waiting for the pipeline update to finish (this builds bronze/silver/gold)...")
 for _ in range(120):  # up to ~20 minutes
     time.sleep(10)
     if update_id is None:
-        update_id = next(iter(w.pipelines.list_updates(pipeline_id=pid))).update_id
-    state = w.pipelines.get_update(pipeline_id=pid, update_id=update_id).state
+        update_id = w.pipelines.list_updates(pipeline_id=pid).updates[0].update_id
+    state = w.pipelines.get_update(pipeline_id=pid, update_id=update_id).update.state
+    state = getattr(state, "value", state)  # enum -> string, e.g. UpdateInfoState.COMPLETED
     if state == "COMPLETED":
         print("Pipeline update COMPLETED — prod is fully built.")
         sys.exit(0)
