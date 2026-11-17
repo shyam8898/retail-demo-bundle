@@ -28,7 +28,7 @@ if job_id is None:
 print(f"Running setup job {JOB_NAME} (id {job_id})...")
 run = w.jobs.run_now(job_id).result()
 state = run.state.result_state
-if state != "SUCCESS":
+if state.value != "SUCCESS":  # enum: compare its string value, e.g. RunResultState.SUCCESS
     print(f"ERROR: setup job finished with state {state}")
     sys.exit(1)
 
