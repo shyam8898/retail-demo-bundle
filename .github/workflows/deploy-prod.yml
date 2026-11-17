@@ -42,3 +42,6 @@ jobs:
       - name: Deploy pass 2 - create the pipeline
         run: databricks bundle deploy -t prod
 
+      - name: Start pipeline - build bronze/silver/gold in prod
+        run: python .github/scripts/start_pipeline.py
+
