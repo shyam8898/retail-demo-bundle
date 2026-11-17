@@ -1,5 +1,9 @@
 # Retail Medallion — DAB (dev -> prod) demo
 
+> **Deployment is fully automated via GitHub Actions**: every push to `main`
+> deploys the complete stack to prod (setup job -> catalog + seed data ->
+> pipeline -> build bronze/silver/gold). No manual steps anywhere.
+
 This bundle moves the retail medallion pipeline from the **dev** workspace to
 **prod** (`https://dbc-7a752a54-93ab.cloud.databricks.com`) and keeps them in
 sync: any code change is made once here and redeployed to both targets.
