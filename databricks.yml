@@ -1,4 +1,4 @@
-# Retail Medallion demo bundle: dev (this workspace) -> prod (dbc-7a752a54-93ab)
+ # Retail Medallion demo bundle: dev (this workspace) -> prod (dbc-7a752a54-93ab)
 #
 # Deploy to dev:  databricks bundle deploy -t dev
 # Deploy to prod: databricks bundle deploy -t prod   (requires prod auth, see README)
