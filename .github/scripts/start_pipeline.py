@@ -47,6 +47,19 @@ for _ in range(120):  # up to ~20 minutes
         sys.exit(0)
     if state in ("FAILED", "CANCELED"):
         print(f"ERROR: pipeline update ended with state {state}")
+        print("---- failure events from the pipeline ----")
+        try:
+            for e in w.pipelines.list_pipeline_events(
+                pipeline_id=pid, max_results=100, filter=f"update_id = '{update_id}'"
+            ):
+                level = getattr(e.level, "value", e.level)
+                if e.error is not None:
+                    print(f"[{e.error.error_class}] {(e.error.message or '')[:1000]}")
+                elif level == "ERROR" or level == "WARN":
+                    print(f"[{level}] {(e.message or '')[:500]}")
+        except Exception as ex:
+            print("could not fetch events:", ex)
+        print("------------------------------------------")
         sys.exit(1)
     print(f"  update state: {state}")
 
