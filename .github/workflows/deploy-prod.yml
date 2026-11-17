@@ -1,18 +1,27 @@
-# Auto-deploys the bundle to PROD on every push to main.
+# Deploys the FULL stack to prod in one run: setup job -> catalog/data -> pipeline.
 #
-# Requires two repository secrets (GitHub -> Settings -> Secrets and variables -> Actions):
+# Why two deploy passes: the pipeline resource references catalog retail_demo,
+# which does not exist in a fresh workspace until the setup job creates it.
+# Pass 1 creates the job (pipeline may fail - tolerated), the bootstrap step
+# runs the job (SQL DDL creates catalog/schemas/volume + seeds data), and
+# pass 2 creates the pipeline. On every later push both passes just succeed.
+#
+# Requires two repository secrets (Settings -> Secrets and variables -> Actions):
 #   PROD_HOST   e.g. https://dbc-7a752a54-93ab.cloud.databricks.com
-#   PROD_TOKEN  a Databricks PAT for the prod workspace (can create pipelines/jobs/catalogs)
+#   PROD_TOKEN  a Databricks PAT for the prod workspace
 name: Deploy bundle to prod
 
 on:
   push:
     branches: [main]
-  workflow_dispatch: {}   # also allows manual runs from the Actions tab
+  workflow_dispatch: {}   # manual runs from the Actions tab
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.PROD_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.PROD_TOKEN }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -20,10 +29,16 @@ jobs:
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
 
-      - name: Deploy to prod
-        run: |
-          databricks bundle validate -t prod
-          databricks bundle deploy -t prod
-        env:
-          DATABRICKS_HOST: ${{ secrets.PROD_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.PROD_TOKEN }}
+      - name: Install Databricks SDK
+        run: pip install databricks-sdk
+
+      - name: Deploy pass 1 - create the setup job
+        run: databricks bundle deploy -t prod
+        continue-on-error: true   # pipeline may fail until the catalog exists
+
+      - name: Bootstrap - run setup job (creates catalog, schemas, volume, seeds data)
+        run: python .github/scripts/bootstrap_prod.py
+
+      - name: Deploy pass 2 - create the pipeline
+        run: databricks bundle deploy -t prod
+
