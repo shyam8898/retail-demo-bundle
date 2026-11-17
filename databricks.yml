@@ -16,7 +16,7 @@ variables:
     description: Unity Catalog hosting the retail medallion architecture
     default: retail_demo
   run_as_user:
-    description: Identity that prod resources run as (best practice: a service principal)
+    description: Identity that prod resources run as (a service principal is best practice)
     default: shyampatel45881@gmail.com
 
 targets:
