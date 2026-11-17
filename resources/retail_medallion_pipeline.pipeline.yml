@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    retail_medallion_pipeline:
+      name: Retail Medallion Pipeline
+      libraries:
+        - glob:
+            include: ../src/transformations/**
+      # Catalog is parameterized so each target can point at its own catalog.
+      catalog: ${var.catalog}
+      channel: CURRENT
+      continuous: false
+      photon: true
+      root_path: ../src
+      schema: default
+      serverless: true

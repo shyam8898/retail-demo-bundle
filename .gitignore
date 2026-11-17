@@ -1,0 +1,9 @@
+# Databricks bundle local state — never commit
+.bundle/
+
+# Local CLI credentials — never commit
+.databrickscfg
+
+# Python
+__pycache__/
+*.pyc

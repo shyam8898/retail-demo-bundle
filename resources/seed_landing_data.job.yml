@@ -1,0 +1,12 @@
+# One-time seeding of the landing volume with the demo CSV batches.
+# In a fresh environment (e.g. prod), run this job once after
+# `databricks bundle deploy`, then start the pipeline.
+# No schedule on purpose: it is a setup step, not a recurring workload.
+resources:
+  jobs:
+    seed_landing_data:
+      name: Retail Demo - Seed Landing Volume
+      tasks:
+        - task_key: seed_landing_volume
+          notebook_task:
+            notebook_path: ../src/notebooks/seed_landing_data.ipynb

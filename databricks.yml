@@ -1,0 +1,38 @@
+# Retail Medallion demo bundle: dev (this workspace) -> prod (dbc-7a752a54-93ab)
+#
+# Deploy to dev:  databricks bundle deploy -t dev
+# Deploy to prod: databricks bundle deploy -t prod   (requires prod auth, see README)
+
+bundle:
+  name: retail-medallion
+  # Catalogs as bundle resources require the direct deployment engine.
+  engine: direct
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Unity Catalog hosting the retail medallion architecture
+    default: retail_demo
+  run_as_user:
+    description: Identity that prod resources run as (best practice: a service principal)
+    default: shyampatel45881@gmail.com
+
+targets:
+  dev:
+    default: true
+    mode: development
+    # No workspace block: deploys to the workspace you are currently logged
+    # in to (this dev workspace). Development mode prefixes resource names
+    # with [DEV <user>] so you can never clobber shared resources.
+
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-7a752a54-93ab.cloud.databricks.com
+    # Production mode runs resources as a fixed identity, parameterized so
+    # each environment (or deployer) can set it without editing this file:
+    #   databricks bundle deploy -t prod --var="run_as_user=<user-or-sp>"
+    run_as:
+      user_name: ${var.run_as_user}

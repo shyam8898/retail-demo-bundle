@@ -1,0 +1,8 @@
+# NOTE — Unity Catalog objects are NOT defined as bundle resources here.
+#
+# This account uses Default Storage, and creating a catalog through the
+# bundle's REST API fails without an explicit managed location
+# ("Metastore storage root URL does not exist"). SQL `CREATE CATALOG`
+# works fine, so the catalog, the four schemas and the landing volume are
+# created by the first task of the `seed_landing_data` job instead
+# (see ../src/notebooks/seed_landing_data).
